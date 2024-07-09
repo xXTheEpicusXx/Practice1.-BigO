@@ -7,6 +7,6 @@ typedef struct queue
 
 }queue;
 
-queue* init_queue();
+queue* queue_init();
 void enqueue(queue* myqueue, char* str);
 char* dequeue(queue* myqueue);

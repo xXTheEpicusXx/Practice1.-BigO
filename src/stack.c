@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-stack *init_stack()
+stack *stack_init()
 {
     stack *mystack = (stack *)malloc(sizeof(stack));
     mystack->head = NULL;

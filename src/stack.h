@@ -5,6 +5,6 @@ typedef struct stack
     struct stack* prev;
 } stack;
 
-stack* init_stack();
+stack* stack_init();
 void push(stack *mystack, char* str);
 char* pop(stack *mystack);

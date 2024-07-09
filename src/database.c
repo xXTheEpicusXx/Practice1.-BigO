@@ -1,7 +1,11 @@
+#include <getopt.h>
+#include <stdio.h>
+#include <string.h>
 #include "database.h"
-#include "getopt.h"
-#include "stdio.h"
-#include "string.h"
+#include "set.h"
+#include "stack.h"
+#include "queue.h"
+#include "hashmap.h"
 
 int input_parsing(int argc, char *argv[])
 {
@@ -30,8 +34,12 @@ int input_parsing(int argc, char *argv[])
             char *cont_name;
             int com_type = 0, cont_type = 0;
             query_parsing(query, &com_type, &cont_type, &cont_name, &val1, &val2);
-            printf("%s %s %s\n", cont_name, val1, val2);
-            printf("%d %d\n", com_type, cont_type);
+            // printf("%s %s %s\n", cont_name, val1, val2);
+            // printf("%d %d\n", com_type, cont_type);
+            int num_str = 0;
+
+            char *data_str = strdup(find_dat_str(filename, cont_name, &num_str));
+            database_processing(data_str, num_str, com_type, cont_type, val1, val2);
             break;
         default:
             break;
@@ -47,8 +55,8 @@ int query_parsing(char *query, int *com_type, int *cont_type, char **cont_name, 
     *cont_name = strtok(NULL, " ");
     *val1 = strtok(NULL, " ");
     *val2 = strtok(NULL, " ");
-    printf("%s\n", command);
-    // обработка команд и типов
+    // printf("%s\n", command);
+    //  обработка команд и типов
     if (strcmp(command, "SADD") == 0)
     {
         *com_type = SADD;
@@ -89,9 +97,132 @@ int query_parsing(char *query, int *com_type, int *cont_type, char **cont_name, 
     {
         *com_type = HGET;
     }
-    else {
+    else
+    {
         error = 1;
     }
-    *cont_type = *com_type/10;
+    *cont_type = *com_type / 10;
     return error;
+}
+
+char *find_dat_str(char *file_name, char *cont_name, int *num_str)
+{
+    FILE *file;
+    char *str = "NULL";
+    int i = 0;
+    if ((file = fopen(file_name, "r")) != NULL)
+    {
+        while (!feof(file))
+        {
+            char buff[MAX_LEN_FILE_STR];
+            fgets(buff, MAX_LEN_FILE_STR, file);
+            char *buff2 = strdup(buff);
+            char *cur = strtok(buff, " ");
+            if (strcmp(cur, cont_name) == 0)
+            {
+
+                str = strdup(buff2);
+                break;
+            }
+            i++;
+        }
+        fclose(file);
+    }
+
+    *num_str = i;
+    return str;
+}
+
+void database_processing(char *str, int num_str, int com_type, int cont_type, char *val1, char *val2)
+{
+    if (strcmp(str, "NULL") != 0)
+    {
+        char *token = strtok(str, " ");
+        token = strtok(NULL, " ");
+        int str_cont_type;
+        // проверка типов конейнеров
+        if (strcmp(token, "set") == 0)
+        {
+            str_cont_type = SET;
+        }
+        else if (strcmp(token, "stack") == 0)
+        {
+            str_cont_type = STACK;
+        }
+        else if (strcmp(token, "queue") == 0)
+        {
+            str_cont_type = QUEUE;
+        }
+        else if (strcmp(token, "hashmap") == 0)
+        {
+            str_cont_type = HASHMAP;
+        }
+        if (str_cont_type == cont_type && token != NULL)
+        {
+            if (cont_type == SET)
+            {
+                set *myset = set_init();
+                while ((token = strtok(NULL, " ")) != NULL)
+                {
+                    if (token[strlen(token) - 1] == '\n')
+                    {
+                        token[strlen(token) - 2] = '\0';
+                    }
+                    add(myset, token);
+                }
+            }
+            else if (cont_type == STACK)
+            {
+                stack *mystack = stack_init();
+                while ((token = strtok(NULL, " ")) != NULL)
+                {
+                    if (token[strlen(token) - 1] == '\n')
+                    {
+                        token[strlen(token) - 2] = '\0';
+                    }
+                    push(mystack, token);
+                }
+
+            }
+            else if (cont_type == QUEUE)
+            {
+
+                queue *myqueue = queue_init();
+                while ((token = strtok(NULL, " ")) != NULL)
+                {
+                    if (token[strlen(token) - 1] == '\n')
+                    {
+                        token[strlen(token) - 2] = '\0';
+                    }
+                    enqueue(myqueue, token);
+                }
+            }
+            else if (cont_type == HASHMAP)
+            {
+
+                hashmap *mymap = map_init();
+                int i = 0;
+                char *k = "NULL";
+                char *v = "NULL";
+                while ((token = strtok(NULL, " ")) != NULL)
+                {
+
+                    if (token[strlen(token) - 1] == '\n')
+                    {
+                        token[strlen(token) - 2] = '\0';
+                    }
+                    if (i % 2 == 0) {
+                        k = strdup(token);
+                    }
+                    else {
+                        v = strdup(token);
+                        printf("%s", k);
+                        hset(mymap, k, v);
+
+                    }
+                    i++;
+                }
+            }
+        }
+    }
 }

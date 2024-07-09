@@ -14,7 +14,7 @@ typedef struct hashmap
 } hashmap;
 
 hashmap* map_init();
-int hash(char* key);
-void set(hashmap* mymap, char* key, char* val);
+int hhash(char* key);
+void hset(hashmap* mymap, char* key, char* val);
 void del(hashmap* mymap, char* key);
 char* get(hashmap mymap, char* key);

@@ -12,7 +12,7 @@ hashmap *map_init()
     return mymap;
 }
 
-int hash(char *key)
+int hhash(char *key)
 {
     int hash = 0;
     for (int i = 0; key[i] != '\0'; i++)
@@ -21,9 +21,9 @@ int hash(char *key)
     }
     return hash;
 }
-void set(hashmap *mymap, char *key, char *val)
+void hset(hashmap *mymap, char *key, char *val)
 {
-    int ind = hash(key);
+    int ind = hhash(key);
     node_of_map *new_node = (node_of_map *)malloc(sizeof(node_of_map));
     new_node->key = strdup(key);
     new_node->val = strdup(val);
@@ -45,7 +45,7 @@ void set(hashmap *mymap, char *key, char *val)
 }
 void del(hashmap *mymap, char *key)
 {
-    int ind = hash(key);
+    int ind = hhash(key);
     node_of_map *cur = mymap->items[ind];
     node_of_map *prev = NULL;
     while (cur != NULL)
@@ -73,7 +73,7 @@ void del(hashmap *mymap, char *key)
 }
 char *get(hashmap mymap, char *key)
 {
-    int ind = hash(key);
+    int ind = hhash(key);
     char *str = NULL;
     node_of_map *cur = mymap.items[ind];
     while (cur != NULL)

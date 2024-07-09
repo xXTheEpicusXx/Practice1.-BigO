@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-queue *init_queue()
+queue *queue_init()
 {
     queue* myqueue = (queue*)malloc(sizeof(queue));
     myqueue->front = NULL;
