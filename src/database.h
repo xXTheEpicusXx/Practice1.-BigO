@@ -21,5 +21,5 @@
 
 int input_parsing(int argc, char *argv[]);
 int query_parsing(char *query, int *com_type, int *cont_type, char **cont_name, char **val1, char **val2);
-char* find_dat_str(char* file_name, char* cont_name, int *num_str);
-void database_processing(char *str, int num_str, int com_type, int cont_type, char *val1, char *val2);
+char *find_dat_str(char *file_name, char *cont_name, int *num_str, int *file_len);
+char* database_processing(char *str, int num_str, int com_type, int cont_type, char *val1, char *val2);

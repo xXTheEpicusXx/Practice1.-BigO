@@ -37,9 +37,71 @@ int input_parsing(int argc, char *argv[])
             // printf("%s %s %s\n", cont_name, val1, val2);
             // printf("%d %d\n", com_type, cont_type);
             int num_str = 0;
+            int file_len = 0;
+            char *data_str = strdup(find_dat_str(filename, cont_name, &num_str, &file_len));
+            if (num_str == -1) {
+                strcat(data_str, cont_name);
+                strcat(data_str, " ");
+                switch (cont_type)
+                {
+                case SET:
+                    strcat(data_str, "set");
+                    strcat(data_str, " ");
+                    break;
+                case STACK:
+                    strcat(data_str, "stack");
+                    strcat(data_str, " ");
+                    break;
+                case QUEUE:
+                    strcat(data_str, "queue");
+                    strcat(data_str, " ");
+                    break;
+                case HASHMAP:
+                    strcat(data_str, "hashmap");
+                    strcat(data_str, " ");
+                    break;
 
-            char *data_str = strdup(find_dat_str(filename, cont_name, &num_str));
-            database_processing(data_str, num_str, com_type, cont_type, val1, val2);
+                default:
+                    break;
+                }
+            }
+            char *new_db_str = strdup(database_processing(data_str, num_str, com_type, cont_type, val1, val2));
+            FILE *file;
+            FILE *buff_file = fopen("buff.dat", "w");
+
+            if ((file = fopen(filename, "r")) != NULL)
+            {
+
+                int is_found = 0;
+                int i = 0;
+                while (i != file_len)
+                {
+                    char buff[MAX_LEN_FILE_STR];
+                    fgets(buff, MAX_LEN_FILE_STR, file);
+
+                    if (i != num_str)
+                    {
+                        fprintf(buff_file, "%s", buff);
+                    }
+                    else
+                    {
+                        printf("yes");
+                        is_found = 1;
+                        fprintf(buff_file, "%s\n", new_db_str);
+                    }
+                    i++;
+                }
+                fclose(file);
+                if (num_str == -1)
+                {
+                    fprintf(buff_file, "%s\n", new_db_str);
+                }
+                fprintf(buff_file, "%s\n", "end_of_file");
+            }
+            remove(filename);
+            rename("buff.dat", filename);
+            fclose(buff_file);
+
             break;
         default:
             break;
@@ -105,11 +167,12 @@ int query_parsing(char *query, int *com_type, int *cont_type, char **cont_name, 
     return error;
 }
 
-char *find_dat_str(char *file_name, char *cont_name, int *num_str)
+char *find_dat_str(char *file_name, char *cont_name, int *num_str, int *file_len)
 {
     FILE *file;
-    char *str = "NULL";
-    int i = 0;
+    char *str = "";
+    int i = -1;
+    int j = 0;
     if ((file = fopen(file_name, "r")) != NULL)
     {
         while (!feof(file))
@@ -122,169 +185,193 @@ char *find_dat_str(char *file_name, char *cont_name, int *num_str)
             {
 
                 str = strdup(buff2);
-                break;
+                i = j;
+                // printf("%d", j);
+                //  break;
             }
-            i++;
+            j++;
         }
         fclose(file);
     }
-
+    *file_len = j;
     *num_str = i;
     return str;
 }
 
-void database_processing(char *str, int num_str, int com_type, int cont_type, char *val1, char *val2)
+char *database_processing(char *str, int num_str, int com_type, int cont_type, char *val1, char *val2)
 {
+    char new_db_str[MAX_LEN_STR] = "";
+    //
+    //{
+    char *token;
     if (strcmp(str, "NULL") != 0)
-    {
-        char new_db_str[MAX_LEN_STR] = "";
-
-        char *token = strtok(str, " ");
-        strcat(new_db_str, token);
-        strcat(new_db_str, " ");
+        token = strtok(str, " ");
+    strcat(new_db_str, token);
+    strcat(new_db_str, " ");
+    if (strcmp(str, "NULL") != 0)
         token = strtok(NULL, " ");
-        strcat(new_db_str, token);
-        strcat(new_db_str, " ");
-        int str_cont_type;
+    strcat(new_db_str, token);
+    strcat(new_db_str, " ");
+    int str_cont_type;
 
-        // проверка типов конейнеров
-        if (strcmp(token, "set") == 0)
-            str_cont_type = SET;
-        else if (strcmp(token, "stack") == 0)
-            str_cont_type = STACK;
-        else if (strcmp(token, "queue") == 0)
-            str_cont_type = QUEUE;
-        else if (strcmp(token, "hashmap") == 0)
-            str_cont_type = HASHMAP;
-        // обработка команды
-        if (str_cont_type == cont_type && token != NULL)
+    // проверка типов конейнеров
+    if (strcmp(token, "set") == 0)
+        str_cont_type = SET;
+    else if (strcmp(token, "stack") == 0)
+        str_cont_type = STACK;
+    else if (strcmp(token, "queue") == 0)
+        str_cont_type = QUEUE;
+    else if (strcmp(token, "hashmap") == 0)
+        str_cont_type = HASHMAP;
+    // обработка команды
+    if (str_cont_type == cont_type /*&& strcmp(str, "NULL") != 0*/)
+    {
+
+        if (cont_type == SET)
         {
-
-            if (cont_type == SET)
+            set *myset = set_init();
+            if (str_cont_type == cont_type && strcmp(str, "NULL") != 0)
             {
-                set *myset = set_init();
                 while ((token = strtok(NULL, " ")) != NULL)
                 {
                     if (token[strlen(token) - 1] == '\n')
-                        token[strlen(token) - 2] = '\0';
+                        token[strlen(token) - 1] = '\0';
                     add(myset, token);
                 }
-                switch (com_type)
-                {
-                case SADD:
-                    add(myset, val1);
-                    break;
-                case SREM:
-                    rem(myset, val1);
-                    break;
-                case SISMEMBER:
-                    printf("%d", is_member(*myset, val1));
-                    break;
-
-                default:
-                    printf("error");
-                    break;
-                }
-
-                for (int i = 0; i < SIZE; i++)
-                {
-                    node_of_set *cur = myset->items[i];
-                    while (cur != NULL)
-                    {
-                        strcat(new_db_str, cur->data);
-
-                        strcat(new_db_str, " ");
-                        cur = cur->next;
-                    }
-                }
-                strcat(new_db_str, "\n");
-                printf("%s", new_db_str);
             }
 
-            else if (cont_type == STACK)
+            switch (com_type)
             {
-                stack *mystack = stack_init();
-                while ((token = strtok(NULL, " ")) != NULL)
-                {
-                    if (token[strlen(token) - 1] == '\n')
-                        token[strlen(token) - 2] = '\0';
-                    push(mystack, token);
-                }
-                switch (com_type)
-                {
-                case SPUSH:
-                    push(mystack, val1);
-                    break;
-                case SPOP:
-                    printf("%s", pop(mystack));
-                    break;
+            case SADD:
+                add(myset, val1);
+                break;
+            case SREM:
+                rem(myset, val1);
+                break;
+            case SISMEMBER:
+                printf("%d", is_member(*myset, val1));
+                break;
 
-                default:
-                    printf("error");
-                    break;
-                }
-                stack *cur = mystack->head;
-                char *datas[MAX_LEN_STR];
-                int count = 0;
+            default:
+                printf("error");
+                break;
+            }
+
+            for (int i = 0; i < SIZE; i++)
+            {
+                node_of_set *cur = myset->items[i];
                 while (cur != NULL)
                 {
-                    datas[count] = strdup(cur->data);
-                    cur = cur->prev;
-                    count++;
-                }
-                for (int j = count - 1; j >= 0; j--)
-                {
-                    strcat(new_db_str, datas[j]);
-
+                    strcat(new_db_str, cur->data);
                     strcat(new_db_str, " ");
+                    cur = cur->next;
                 }
-                strcat(new_db_str, "\n");
-                printf("%s", new_db_str);
             }
 
-            else if (cont_type == QUEUE)
+            new_db_str[strlen(new_db_str) - 1] = '\0';
+        }
+
+        else if (cont_type == STACK)
+        {
+            stack *mystack = stack_init();
+            if (str_cont_type == cont_type && strcmp(str, "NULL") != 0)
             {
-                queue *myqueue = queue_init();
+                while ((token = strtok(NULL, " ")) != NULL)
+                {
+                    // printf("%d ", token[strlen(token) - 1]);
+                    if (token[strlen(token) - 1] == '\n')
+                        token[strlen(token) - 1] = '\0';
+
+                    // if (strcmp(token, "\n") != 0) {
+                    // printf("%s ", token);
+                    push(mystack, token);
+                    //}
+                }
+            }
+
+            switch (com_type)
+            {
+            case SPUSH:
+                push(mystack, val1);
+                break;
+            case SPOP:
+                printf("%s", pop(mystack));
+                break;
+
+            default:
+                printf("error");
+                break;
+            }
+            stack *cur = mystack->head;
+            char *datas[MAX_LEN_STR];
+            int count = 0;
+            while (cur != NULL)
+            {
+                datas[count] = strdup(cur->data);
+                cur = cur->prev;
+                count++;
+            }
+            for (int j = count - 1; j >= 0; j--)
+            {
+                strcat(new_db_str, datas[j]);
+                strcat(new_db_str, " ");
+            }
+            // printf("%d", new_db_str[strlen(new_db_str) - 1]);
+            //  if (new_db_str[strlen(new_db_str) - 1] == ' ')
+            new_db_str[strlen(new_db_str) - 1] = '\0';
+            // strcat(new_db_str, "\n");
+            // printf("%s", new_db_str);
+        }
+
+        else if (cont_type == QUEUE)
+        {
+            queue *myqueue = queue_init();
+            if (str_cont_type == cont_type && strcmp(str, "NULL") != 0)
+            {
                 while ((token = strtok(NULL, " ")) != NULL)
                 {
                     if (token[strlen(token) - 1] == '\n')
-                        token[strlen(token) - 2] = '\0';
+                        token[strlen(token) - 1] = '\0';
                     enqueue(myqueue, token);
                 }
-                switch (com_type)
-                {
-                case QPUSH:
-                    enqueue(myqueue, val1);
-                    break;
-                case QPOP:
-                    printf("%s", dequeue(myqueue));
-                    break;
-
-                default:
-                    printf("error");
-                    break;
-                }
-                while (myqueue->front != NULL)
-                {
-                    strcat(new_db_str, myqueue->front->data);
-
-                    strcat(new_db_str, " ");
-                    myqueue->front = myqueue->front->next;
-                }
-                strcat(new_db_str, "\n");
-                printf("%s", new_db_str);
             }
 
-            else if (cont_type == HASHMAP)
+            switch (com_type)
             {
-                hashmap *mymap = map_init();
-                int i = 0;
-                char *k = "NULL";
-                char *v = "NULL";
+            case QPUSH:
+                enqueue(myqueue, val1);
+                break;
+            case QPOP:
+                printf("%s", dequeue(myqueue));
+                break;
+
+            default:
+                printf("error");
+                break;
+            }
+            while (myqueue->front != NULL)
+            {
+                strcat(new_db_str, myqueue->front->data);
+
+                strcat(new_db_str, " ");
+                myqueue->front = myqueue->front->next;
+            }
+
+            new_db_str[strlen(new_db_str) - 1] = '\0';
+        }
+
+        else if (cont_type == HASHMAP)
+        {
+            hashmap *mymap = map_init();
+            int i = 0;
+            char *k = "NULL";
+            char *v = "NULL";
+            if (str_cont_type == cont_type && strcmp(str, "NULL") != 0)
+            {
                 while ((token = strtok(NULL, " ")) != NULL)
                 {
                     if (token[strlen(token) - 1] == '\n')
-                        token[strlen(token) - 2] = '\0';
+                        token[strlen(token) - 1] = '\0';
                     if (i % 2 == 0)
                         k = strdup(token);
                     else
@@ -295,40 +382,45 @@ void database_processing(char *str, int num_str, int com_type, int cont_type, ch
                     }
                     i++;
                 }
-                switch (com_type)
-                {
-
-                case HSET:
-                    hset(mymap, val1, val2);
-                    break;
-                case HDEL:
-                    del(mymap, val1);
-                    break;
-                case HGET:
-                    printf("%s", get(*mymap, val1));
-                    break;
-
-                default:
-                    printf("error");
-                    break;
-                }
-                for (int i = 0; i < SIZE; i++)
-                {
-                    node_of_map *cur = mymap->items[i];
-                    while (cur != NULL)
-                    {
-                        strcat(new_db_str, cur->key);
-
-                        strcat(new_db_str, " ");
-                        strcat(new_db_str, cur->val);
-
-                        strcat(new_db_str, " ");
-                        cur = cur->next;
-                    }
-                }
-                strcat(new_db_str, "\n");
-                printf("%s", new_db_str);
             }
+
+            switch (com_type)
+            {
+
+            case HSET:
+                hset(mymap, val1, val2);
+                break;
+            case HDEL:
+                del(mymap, val1);
+                break;
+            case HGET:
+                printf("%s", get(*mymap, val1));
+                break;
+
+            default:
+                printf("error");
+                break;
+            }
+            for (int i = 0; i < SIZE; i++)
+            {
+                node_of_map *cur = mymap->items[i];
+                while (cur != NULL)
+                {
+                    strcat(new_db_str, cur->key);
+
+                    strcat(new_db_str, " ");
+                    strcat(new_db_str, cur->val);
+
+                    strcat(new_db_str, " ");
+                    cur = cur->next;
+                }
+            }
+
+            new_db_str[strlen(new_db_str) - 1] = '\0';
         }
     }
+    //}
+    char *s = strdup(new_db_str);
+    printf("%s", s);
+    return s;
 }
