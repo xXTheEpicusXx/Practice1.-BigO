@@ -18,15 +18,24 @@ void push(stack *mystack, char *str)
 }
 char *pop(stack *mystack)
 {
-    char *str = NULL;
-    if (mystack->head != NULL)
+    if (!is_empty_stack(mystack))
     {
+        char *str = NULL;
+        if (mystack->head != NULL)
+        {
 
-        stack *head_item = mystack->head;
-        str = strdup(head_item->data);
-        mystack->head = head_item->prev;
-        free(head_item);
-
+            stack *head_item = mystack->head;
+            str = strdup(head_item->data);
+            mystack->head = head_item->prev;
+            free(head_item);
+        }
+        return str;
     }
-    return str;
+    else
+        return "NULL";
+}
+
+int is_empty_stack(stack *mystack)
+{
+    return mystack->head == NULL;
 }

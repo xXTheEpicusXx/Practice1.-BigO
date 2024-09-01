@@ -19,4 +19,4 @@ int hash(char* key);
 void add(set* myset, char* key);
 void rem(set* myset, char* key);
 int is_member(set myset, char* key);
-
+int is_empty_set(set myset);

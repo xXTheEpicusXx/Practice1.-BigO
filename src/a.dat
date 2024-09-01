@@ -1,8 +1,3 @@
-
-myqu queue r t y u
-tt ee
-myst stack a b c d
-myse set b n p l u q
-myma hashmap k v h m o p
-myse set b n p l u q
-sds
+myset set a b c d
+mymap hashmap a w b x c y d z
+end_of_file

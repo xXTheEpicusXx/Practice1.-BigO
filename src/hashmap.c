@@ -14,7 +14,7 @@ hashmap *map_init()
 
 int hhash(char *key)
 {
-    int hash = 0;
+    int hash = 1;
     for (int i = 0; key[i] != '\0'; i++)
     {
         hash = (hash * PRIME + (int)key[i]) % SIZE;
@@ -73,17 +73,34 @@ void del(hashmap *mymap, char *key)
 }
 char *get(hashmap mymap, char *key)
 {
-    int ind = hhash(key);
-    char *str = NULL;
-    node_of_map *cur = mymap.items[ind];
-    while (cur != NULL)
+    if (!is_empty_map(&mymap))
     {
-        if (strcmp(cur->key, key) == 0)
+        int ind = hhash(key);
+        char *str = NULL;
+        node_of_map *cur = mymap.items[ind];
+        while (cur != NULL)
         {
-            str = strdup(cur->val);
-            break;
+            if (strcmp(cur->key, key) == 0)
+            {
+                str = strdup(cur->val);
+                break;
+            }
+            cur = cur->next;
         }
-        cur = cur->next;
+        return str;
     }
-    return str;
+    else
+        return "NULL";
+}
+
+int is_empty_map(hashmap *mymap)
+{
+    for (int i = 0; i < SIZE; i++)
+    {
+        if (mymap->items[i] != NULL)
+        {
+            return 0;
+        }
+    }
+    return 1;
 }

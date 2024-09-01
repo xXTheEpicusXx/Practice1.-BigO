@@ -4,7 +4,7 @@
 
 queue *queue_init()
 {
-    queue* myqueue = (queue*)malloc(sizeof(queue));
+    queue *myqueue = (queue *)malloc(sizeof(queue));
     myqueue->front = NULL;
     myqueue->rear = NULL;
     myqueue->next = NULL;
@@ -12,28 +12,43 @@ queue *queue_init()
 }
 void enqueue(queue *myqueue, char *str)
 {
-    queue* new_item= (queue*)malloc(sizeof(queue));
+    queue *new_item = (queue *)malloc(sizeof(queue));
     new_item->data = strdup(str);
     new_item->next = NULL;
-    if(myqueue->front == NULL) {
+    if (myqueue->front == NULL)
+    {
         myqueue->front = new_item;
         myqueue->rear = new_item;
-    } else {
+    }
+    else
+    {
         myqueue->rear->next = new_item;
         myqueue->rear = new_item;
     }
-
 }
 char *dequeue(queue *myqueue)
 {
-    char *str = NULL;
-    if(myqueue->front != NULL) {
-        queue* front_item = myqueue->front;
-        str = strdup(front_item->data);
-        myqueue->front = front_item->next;
-        free(front_item);
-    } else {
-        myqueue->rear = NULL;
+    if (!is_empty_queue(myqueue))
+    {
+        char *str = NULL;
+        if (myqueue->front != NULL)
+        {
+            queue *front_item = myqueue->front;
+            str = strdup(front_item->data);
+            myqueue->front = front_item->next;
+            free(front_item);
+        }
+        else
+        {
+            myqueue->rear = NULL;
+        }
+        return str;
     }
-    return str;
+    else
+        return "NULL";
+}
+
+int is_empty_queue(queue *myqueue)
+{
+    return myqueue->front == NULL;
 }

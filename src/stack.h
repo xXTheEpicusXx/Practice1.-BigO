@@ -8,3 +8,4 @@ typedef struct stack
 stack* stack_init();
 void push(stack *mystack, char* str);
 char* pop(stack *mystack);
+int is_empty_stack(stack *mystack);
