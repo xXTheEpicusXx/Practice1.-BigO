@@ -92,3 +92,20 @@ int is_empty_set(set myset)
     }
     return is_empty;
 }
+
+void set_clear(set *myset)
+{
+    for (int i = 0; i < SIZE; i++)
+    {
+        node_of_set *cur = myset->items[i];
+        while (cur != NULL)
+        {
+            node_of_set *temp = cur;
+            cur = cur->next;
+            free(temp->data);
+            free(temp);
+        }
+        myset->items[i] = NULL;
+    }
+    free(myset);
+}

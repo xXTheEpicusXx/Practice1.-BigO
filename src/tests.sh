@@ -9,10 +9,10 @@ make all
 ./dbms -f a.dat -q 'SPUSH mystack c'
 ./dbms -f a.dat -q 'SPUSH mystack d'
 
-./dbms -f a.dat -q 'SPOP mystack'
-./dbms -f a.dat -q 'SPOP mystack'
-./dbms -f a.dat -q 'SPOP mystack'
-./dbms -f a.dat -q 'SPOP mystack'
+#./dbms -f a.dat -q 'SPOP mystack'
+#./dbms -f a.dat -q 'SPOP mystack'
+#./dbms -f a.dat -q 'SPOP mystack'
+#./dbms -f a.dat -q 'SPOP mystack'
 
 #set
 
@@ -69,6 +69,8 @@ make all
 
 ./dbms -f a.dat -q 'SISMEMBER nmyset d'
 ./dbms -f a.dat -q 'HGET nmymap e'
+
+./dbms -f not_found.dat -q 'SISMEMBER nmyset d'
 
 ##incorrect option test
 

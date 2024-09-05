@@ -11,3 +11,4 @@ queue* queue_init();
 void enqueue(queue* myqueue, char* str);
 char* dequeue(queue* myqueue);
 int is_empty_queue(queue *myqueue);
+void queue_clear(queue *myqueue);

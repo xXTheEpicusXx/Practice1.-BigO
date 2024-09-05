@@ -52,3 +52,13 @@ int is_empty_queue(queue *myqueue)
 {
     return myqueue->front == NULL;
 }
+
+void queue_clear(queue *myqueue)
+{
+    while (!is_empty_queue(myqueue))
+    {
+        char *str = dequeue(myqueue);
+        free(str);
+    }
+    free(myqueue);
+}

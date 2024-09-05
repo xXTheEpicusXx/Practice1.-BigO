@@ -39,3 +39,12 @@ int is_empty_stack(stack *mystack)
 {
     return mystack->head == NULL;
 }
+
+void stack_clear(stack *mystack)
+{
+    while (mystack->head != NULL)
+    {
+        pop(mystack);
+    }
+    free(mystack);
+}

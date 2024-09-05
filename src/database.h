@@ -1,7 +1,7 @@
 #define MAX_LEN_STR 100
 #define MAX_LEN_FILE_STR 1000
 
-//коды команд
+// коды команд
 #define SADD 11
 #define SREM 12
 #define SISMEMBER 13
@@ -13,7 +13,7 @@
 #define HDEL 42
 #define HGET 43
 
-//коды типов контейнеров
+// коды типов контейнеров
 #define SET 1
 #define STACK 2
 #define QUEUE 3
@@ -22,4 +22,10 @@
 int input_parsing(int argc, char *argv[]);
 int query_parsing(char *query, int *com_type, int *cont_type, char **cont_name, char **val1, char **val2);
 char *find_dat_str(char *file_name, char *cont_name, int *num_str, int *file_len);
-char* database_processing(char *str, int num_str, int com_type, int cont_type, char *val1, char *val2);
+char *database_processing(char *str, int num_str, int com_type, int cont_type, char *val1, char *val2);
+
+void upd_set(char *new_db_str, int com_type, char *val1, char **datas, char elems_cnt);
+void upd_stack(char *new_db_str, int com_type, char *val1, char **datas, char elems_cnt);
+void upd_queue(char *new_db_str, int com_type, char *val1, char **datas, char elems_cnt);
+void upd_hashmap(char *new_db_str, int com_type, char *val1, char *val2, char **datas, char elems_cnt);
+void upd_file(char *filename, int file_len, char *data_str, int num_str, int com_type, int cont_type, char *val1, char *val2);

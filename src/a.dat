@@ -1,3 +1,4 @@
+mystack stack a b c d
 myset set a b c d
 mymap hashmap a w b x c y d z
 end_of_file

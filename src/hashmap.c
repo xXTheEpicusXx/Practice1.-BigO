@@ -76,13 +76,13 @@ char *get(hashmap mymap, char *key)
     if (!is_empty_map(&mymap))
     {
         int ind = hhash(key);
-        char *str = NULL;
+        char *str = "NULL";
         node_of_map *cur = mymap.items[ind];
         while (cur != NULL)
         {
             if (strcmp(cur->key, key) == 0)
             {
-                str = strdup(cur->val);
+                    str = strdup(cur->val);
                 break;
             }
             cur = cur->next;
@@ -103,4 +103,22 @@ int is_empty_map(hashmap *mymap)
         }
     }
     return 1;
+}
+
+void map_clear(hashmap *mymap)
+{
+    for (int i = 0; i < SIZE; i++)
+    {
+        node_of_map *cur = mymap->items[i];
+        while (cur != NULL)
+        {
+            node_of_map *next = cur->next;
+            free(cur->key);
+            free(cur->val);
+            free(cur);
+            cur = next;
+        }
+        mymap->items[i] = NULL;
+    }
+    free(mymap);
 }

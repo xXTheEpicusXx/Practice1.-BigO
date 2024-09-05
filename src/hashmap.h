@@ -19,3 +19,4 @@ void hset(hashmap* mymap, char* key, char* val);
 void del(hashmap* mymap, char* key);
 char* get(hashmap mymap, char* key);
 int is_empty_map(hashmap *mymap);
+void map_clear(hashmap *mymap);
